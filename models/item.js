@@ -9,3 +9,9 @@ export function addItem(name, description) {
     INSERT INTO items (name, description) VALUES (?, ?)
     `).run(name, description);
 }
+
+// export function addItemVulnerable(name, description) {
+//     const query =
+//       `INSERT INTO items (name, description) VALUES ('${name}', '${description}')`;
+//     db.exec(query);
+//   }

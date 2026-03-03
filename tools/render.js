@@ -7,9 +7,10 @@ export function render(viewFunction, viewData = {}) {
     <head>
       <meta charset="utf-8">
       <title>My Website</title>
-      <link rel="stylesheet" href="style.css">
+      <link rel="stylesheet" href="/style.css">
     </head>
     <body>
+      <div class="container">
       <header>
         <h1>My Website</h1>
       </header>
@@ -30,6 +31,7 @@ export function render(viewFunction, viewData = {}) {
       <footer>
         <p>&copy; 2026 My Website. All rights reserved.</p>
       </footer>
+      </div>
     </body>
   </html>`,
       { headers: { "content-type": "text/html; charset=utf-8" } }
