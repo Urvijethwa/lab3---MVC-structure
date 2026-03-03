@@ -124,3 +124,14 @@
     font-size: 14px;
     color: #6b7280;
   }
+
+  .error {
+    display: block;
+    margin-top: 4px;
+    color: red;
+    font-size: 13px;
+  }
+  
+  input[aria-invalid="true"] {
+    border: 1px solid red;
+  }
