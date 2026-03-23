@@ -1,4 +1,5 @@
 import { serveDir } from "@std/http/file-server";
+import { currentSession } from "./tools/auth.js";
 
 import { homeController } from "./controllers/home.js";
 import { aboutController } from "./controllers/about.js";
@@ -9,39 +10,45 @@ import { itemsController } from "./controllers/items.js";
 import { addItemController } from "./controllers/add-item.js";
 
 import { staffController, createStaffController } from "./controllers/staff.js";
-import { profileController } from "./controllers/staff-profile.js";
+import { staffProfileController } from "./controllers/staff-profile.js";
 
-export async function handler(req) {
-  const url = new URL(req.url);
+import { registrationFormController, registrationController } from "./controllers/user.js";
+import { loginFormController, loginController, logoutController } from "./controllers/sessions.js";
+
+export async function handler(request) {
+  const session = currentSession(request);
+  const ctx = { request, session };
+
+  const url = new URL(request.url);
   const pathname = url.pathname;
-  const method = req.method;
+  const method = request.method;
 
   // Serve files from /public
   if (pathname.endsWith(".css")) {
-    return serveDir(req, { fsRoot: "public" });
+    return serveDir(request, { fsRoot: "public" });
   }
 
   // Basic routes
-  if (pathname === "/" && method === "GET") return homeController();
-  if (pathname === "/about" && method === "GET") return aboutController();
-  if (pathname === "/contact" && method === "GET") return contactController();
+  if (pathname === "/" && method === "GET") return homeController(ctx);
+  if (pathname === "/about" && method === "GET") return aboutController(ctx);
+  if (pathname === "/contact" && method === "GET") return contactController(ctx);
 
   // Items routes
   if (pathname === "/items" && method === "GET") {
-    return itemsController();
+    return itemsController(ctx);
   }
 
   if (pathname === "/items" && method === "POST") {
-    return addItemController(req);
+    return addItemController(ctx);
   }
 
   // Staff routes
   if (pathname === "/staff" && method === "GET") {
-    return staffController();
+    return staffController(ctx);
   }
 
   if (pathname === "/staff" && method === "POST") {
-    return createStaffController({ request: req });
+    return createStaffController({ request });
   }
 
   // Staff profile image route
@@ -50,8 +57,29 @@ export async function handler(req) {
   if (profilePattern.test(url) && method === "GET") {
     const match = profilePattern.exec(url);
     const { staffId } = match.pathname.groups;
-    return profileController({ staffId });
+    return staffProfileController({ params: { staffId } });
   }
 
-  return notFoundController();
+  // Authentication routes
+  if (pathname === "/register" && method === "GET") {
+    return registrationFormController(ctx);
+  }
+
+  if (pathname === "/users" && method === "POST") {
+    return registrationController(ctx);
+  }
+
+  if (pathname === "/login" && method === "GET") {
+    return loginFormController(ctx);
+  }
+
+  if (pathname === "/sessions" && method === "POST") {
+    return loginController(ctx);
+  }
+
+  if (pathname === "/logout" && method === "POST") {
+    return logoutController(ctx);
+  }
+
+  return notFoundController(ctx);
 }
